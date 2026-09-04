@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SL A STUDIO</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#08090d;color:#fff}
+header{position:sticky;top:0;z-index:10;background:#0d0f16ee;backdrop-filter:blur(10px);padding:15px}
+.logo{font-size:24px;font-weight:900;letter-spacing:2px}
+.logo span{color:#8b5cf6}
+nav{display:flex;gap:8px;margin-top:12px;overflow:auto}
+button{border:0;border-radius:10px;padding:10px 14px;background:#181b25;color:#fff;cursor:pointer}
+button.active,button:hover{background:#7c3aed}
+.container{max-width:1100px;margin:auto;padding:20px}
+.hero{padding:35px 22px;border-radius:20px;background:linear-gradient(135deg,#171225,#111827);margin-bottom:25px}
+.hero h1{font-size:34px;margin-bottom:10px}.hero p{color:#b9b9c7;line-height:1.5}
+.search{width:100%;padding:14px;margin:18px 0;background:#12151d;border:1px solid #292d39;border-radius:12px;color:#fff}
+h2{margin:22px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:15px}
+.card{background:#11141c;border:1px solid #202431;border-radius:15px;overflow:hidden;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:#7c3aed}
+.poster{height:190px;background:linear-gradient(135deg,#312e81,#111827);display:flex;align-items:center;justify-content:center;font-size:48px}
+.info{padding:12px}.title{font-weight:700}.tag{font-size:12px;color:#a78bfa;margin-top:6px}
+.empty{padding:30px;text-align:center;color:#888}
+footer{text-align:center;color:#777;padding:35px}
+.edited-by{margin-top:10px;color:#a78bfa;font-weight:800;letter-spacing:2px;text-shadow:0 0 12px #7c3aed;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">SL A <span>STUDIO</span></div>
+  <nav>
+    <button class="active" onclick="show('home',this)">🏠 Home</button>
+    <button onclick="show('anime',this)">🎌 Anime</button>
+    <button onclick="show('manga',this)">📖 Manga</button>
+    <button onclick="show('trend',this)">🔥 Trending</button>
+    <button onclick="show('fav',this)">⭐ Favorites</button>
+  </nav>
+</header>
+
+<main class="container">
+<section id="home">
+  <div class="hero">
+    <h1>Welcome to SL A STUDIO ⚡</h1>
+    <p>Anime & Manga එකම තැනක. Search කරන්න, favorites save කරන්න සහ ඔයාගේ collection එක manage කරන්න.</p>
+  </div>
+  <input id="search" class="search" placeholder="🔎 Search Anime or Manga..." oninput="searchItems()">
+  <h2>🔥 Popular</h2><div id="homeGrid" class="grid"></div>
+</section>
+
+<section id="anime" hidden><h2>🎌 Anime</h2><div id="animeGrid" class="grid"></div></section>
+<section id="manga" hidden><h2>📖 Manga</h2><div id="mangaGrid" class="grid"></div></section>
+<section id="trend" hidden><h2>🔥 Trending</h2><div id="trendGrid" class="grid"></div></section>
+<section id="fav" hidden><h2>⭐ Favorites</h2><div id="favGrid" class="grid"></div></section>
+</main>
+<footer>
+  <div>© 2026 SL A STUDIO • Anime & Manga Hub</div>
+  <div class="edited-by">✦ EDITED BY NETHUWA ✦</div>
+</footer>
+
+<script>
+const items=[
+ {id:1,title:"Jujutsu Kaisen",type:"Anime",icon:"⚔️",trend:true},
+ {id:2,title:"Naruto",type:"Anime",icon:"🍥",trend:true},
+ {id:3,title:"Solo Leveling",type:"Anime",icon:"⚡",trend:true},
+ {id:4,title:"One Piece",type:"Anime",icon:"🏴‍☠️",trend:true},
+ {id:5,title:"Demon Slayer",type:"Anime",icon:"🔥",trend:false},
+ {id:6,title:"Dragon Ball",type:"Anime",icon:"🐉",trend:false},
+ {id:7,title:"Jujutsu Kaisen Manga",type:"Manga",icon:"📕",trend:true},
+ {id:8,title:"Solo Leveling Manga",type:"Manga",icon:"📘",trend:true},
+ {id:9,title:"One Piece Manga",type:"Manga",icon:"📗",trend:false},
+ {id:10,title:"Naruto Manga",type:"Manga",icon:"📙",trend:false}
+];
+let fav=JSON.parse(localStorage.getItem("slastudioFav")||"[]");
+
+function card(x){
+ return `<div class="card">
+ <div class="poster">${x.icon}</div>
+ <div class="info"><div class="title">${x.title}</div><div class="tag">${x.type} • ${fav.includes(x.id)?"⭐ Saved":" "}</div>
+ <button style="margin-top:10px;width:100%" onclick="toggleFav(${x.id})">${fav.includes(x.id)?"★ Remove":"☆ Favorite"}</button></div></div>`;
+}
+function render(id,list){document.getElementById(id).innerHTML=list.length?list.map(card).join(""):'<div class="empty">Nothing here yet.</div>'}
+function all(){render("homeGrid",items.slice(0,6));render("animeGrid",items.filter(x=>x.type==="Anime"));render("mangaGrid",items.filter(x=>x.type==="Manga"));render("trendGrid",items.filter(x=>x.trend));render("favGrid",items.filter(x=>fav.includes(x.id)))}
+function toggleFav(id){fav=fav.includes(id)?fav.filter(x=>x!==id):[...fav,id];localStorage.setItem("slastudioFav",JSON.stringify(fav));all()}
+function show(name,btn){
+ document.querySelectorAll("main section").forEach(s=>s.hidden=true);
+ document.getElementById(name).hidden=false;
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+}
+function searchItems(){
+ const q=document.getElementById("search").value.toLowerCase();
+ render("homeGrid",items.filter(x=>x.title.toLowerCase().includes(q)));
+}
+all();
+</script>
+</body>
+</html>
